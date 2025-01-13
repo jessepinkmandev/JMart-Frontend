@@ -1,5 +1,6 @@
 import { FaEye, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Rating from "../Rating";
+import { Link } from "react-router-dom";
 
 const FeatureProducts = () => {
   const rating = 4;
@@ -31,9 +32,12 @@ const FeatureProducts = () => {
                   <li className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all">
                     <FaRegHeart />
                   </li>
-                  <li className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all">
+                  <Link
+                    to="/product/details/new"
+                    className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all"
+                  >
                     <FaEye />
-                  </li>
+                  </Link>
                   <li className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all">
                     <FaShoppingCart />
                   </li>
