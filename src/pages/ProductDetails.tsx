@@ -17,7 +17,7 @@ import Review from "../components/Review";
 
 const ProductDetails = () => {
   const images = [1, 2, 3, 4, 5, 6];
-  const discount = 5;
+  const discount = 10;
   const stock = 3;
   const [pic, setPic] = useState(1);
 
