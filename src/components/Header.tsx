@@ -20,7 +20,7 @@ const style = {
   li: `flex relative justify-center items-center gap-2 text-sm after:absolute after:h-4 after:w-0.5 after:bg-[#afafaf] after:-right-4`,
 };
 
-const Header = () => {
+const Header = ({ categorys }) => {
   const { pathname } = useLocation();
   const user = true;
   const [showSidebar, setShowSidebar] = useState(true);
@@ -28,16 +28,6 @@ const Header = () => {
   const [searchValue, setSearchValue] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const wishlist_count = 4;
-  const category = [
-    "Phone",
-    "Laptop",
-    "Watch",
-    "Earphones",
-    "Books",
-    "Charger",
-    "Earbuds",
-    "Neckband",
-  ];
 
   return (
     <div className="w-full ">
@@ -404,13 +394,18 @@ const Header = () => {
                     categoryShow ? "hidden" : "visible"
                   } py-2 transition-all duration-700 text-slate-600 font-medium text-sm block `}
                 >
-                  {category.map((c, i) => {
+                  {categorys.map((c, i) => {
                     return (
                       <li
                         key={i}
                         className="flex justify-start items-center gap-2 px-8 py-1.5"
                       >
-                        <Link>{c}</Link>
+                        <img
+                          className="rounded-full w-8 h-8"
+                          src={c.image}
+                          alt=""
+                        />
+                        <Link>{c.name}</Link>
                       </li>
                     );
                   })}
@@ -432,8 +427,8 @@ const Header = () => {
                       id=""
                     >
                       <option value="">Select Category</option>
-                      {category.map((c, i) => (
-                        <option value={c}>{c}</option>
+                      {categorys.map((c, i) => (
+                        <option value={i}>{c.name}</option>
                       ))}
                     </select>
                   </div>

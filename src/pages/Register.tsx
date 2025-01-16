@@ -12,11 +12,15 @@ const Register = () => {
   });
 
   const inputHandle = (e) => {
-    e.preventDefault();
     setState({
       ...state,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const register = (e) => {
+    e.preventDefault();
+    console.log(state);
   };
 
   return (
@@ -30,10 +34,12 @@ const Register = () => {
                 Register Now
               </h2>
               <div className="">
-                <form className="text-slate-600">
+                <form onSubmit={register} className="text-slate-600">
                   <div className="flex flex-col gap-1 mb-2">
                     <label htmlFor="name">Name</label>
                     <input
+                      onChange={inputHandle}
+                      value={state.name}
                       type="text"
                       name="name"
                       id="name"
@@ -46,6 +52,8 @@ const Register = () => {
                   <div className="flex flex-col gap-1 mb-2">
                     <label htmlFor="email">Email</label>
                     <input
+                      onChange={inputHandle}
+                      value={state.email}
                       type="text"
                       name="email"
                       id="email"
@@ -58,6 +66,8 @@ const Register = () => {
                   <div className="flex flex-col gap-1 mb-2">
                     <label htmlFor="password">Password</label>
                     <input
+                      onChange={inputHandle}
+                      value={state.password}
                       type="password"
                       name="password"
                       id="password"
