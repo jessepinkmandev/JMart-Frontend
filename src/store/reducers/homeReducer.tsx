@@ -27,26 +27,71 @@ export const get_products = createAsyncThunk(
   }
 );
 
+export const price_range_products = createAsyncThunk(
+  "product/price_range_products",
+  async (_, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/home/price-range-latest-product");
+      console.log(data);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+
+export const query_products = createAsyncThunk(
+  "product/query_products",
+  async (query, { fulfillWithValue }) => {
+    const { low, high, category, rating, sortPrice, pageNumber } = query;
+    try {
+      const { data } = await api.get(
+        `/home/query-products?category=${category}&&rating=${rating}&&lowPrice=${low}&&highPrice=${high}&&sortPrice=${sortPrice}&&pagenumber=${pageNumber}`
+      );
+      console.log(data);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+
 export const homeReducer = createSlice({
   name: "home",
   initialState: {
     categorys: [],
     products: [],
-    latestProducts: [],
+    totalProduct: 0,
+    perpage: 3,
+    latest_product: [],
     topRatedProducts: [],
     discountProducts: [],
+    priceRange: {
+      low: 0,
+      high: 100,
+    },
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(get_category.fulfilled, (state, { payload }) => {
-      state.categorys = payload.categorys;
-    });
-    builder.addCase(get_products.fulfilled, (state, { payload }) => {
-      state.products = payload.products;
-      state.latestProducts = payload.latestProducts;
-      state.topRatedProducts = payload.topRatedProducts;
-      state.discountProducts = payload.discountProducts;
-    });
+    builder
+      .addCase(get_category.fulfilled, (state, { payload }) => {
+        state.categorys = payload.categorys;
+      })
+      .addCase(get_products.fulfilled, (state, { payload }) => {
+        state.products = payload.products;
+        state.latest_products = payload.latest_product;
+        state.topRatedProducts = payload.topRatedProducts;
+        state.discountProducts = payload.discountProducts;
+      })
+      .addCase(price_range_products.fulfilled, (state, { payload }) => {
+        state.priceRange = payload.priceRange;
+        state.latest_product = payload.latest_product;
+      })
+      .addCase(query_products.fulfilled, (state, { payload }) => {
+        state.products = payload.products;
+        state.totalProduct = payload.totalProduct;
+        state.perpage = payload.perpage;
+      });
   },
 });
 

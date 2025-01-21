@@ -1,7 +1,7 @@
 import { FaEye, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Rating from "./Rating";
 
-const ShopProducts = ({ styles }) => {
+const ShopProducts = ({ styles, products }) => {
   return (
     <div
       className={`w-full gap-3 grid ${
@@ -10,7 +10,7 @@ const ShopProducts = ({ styles }) => {
           : "grid-cols-1 md-lg:grid-cols-2 md:grid-cols-2"
       }`}
     >
-      {[1, 2, 3, 4, 5, 6].map((p, i) => (
+      {products.map((p, i) => (
         <div
           key={i}
           className={`flex transition-all duration-1000 hover:shadow-md hover:-translate-y-3 ${
@@ -28,7 +28,7 @@ const ShopProducts = ({ styles }) => {
           >
             <img
               className="h-60 md:h-72 xs:h-44 rounded-md w-full object-cover "
-              src={`http://localhost:5173/products/${i + 1}.webp`}
+              src={p.images[0]}
               alt=""
             />
             <ul className="flex transition-all duration-700 -bottom-10 justify-center items-center gap-2 absolute w-full group-hover:bottom-3">
@@ -44,11 +44,11 @@ const ShopProducts = ({ styles }) => {
             </ul>
           </div>
           <div className="flex justify-start items-start flex-col gap-3  ">
-            <h2 className="font-bold">Product Name</h2>
+            <h2 className="font-bold">{p.name}</h2>
             <div className="flex justify-start items-start gap-3">
-              <span className="text-md font-semibold">$132</span>
+              <span className="text-md font-semibold">${p.price}</span>
               <div className="flex">
-                <Rating rating={4} />
+                <Rating rating={p.raing} />
               </div>
             </div>
           </div>

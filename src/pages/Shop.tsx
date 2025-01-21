@@ -2,7 +2,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Range } from "react-range";
 import { AiFillStar } from "react-icons/ai";
 import { CiStar } from "react-icons/ci";
@@ -11,26 +11,92 @@ import { BsFillGridFill } from "react-icons/bs";
 import { FaThList } from "react-icons/fa";
 import ShopProducts from "../components/ShopProducts";
 import Pagination from "../components/Pagination";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  price_range_products,
+  query_products,
+} from "../store/reducers/homeReducer";
 
 const Shop = () => {
+  // get state
+  const {
+    categorys,
+    priceRange,
+    latest_product,
+    totalProduct,
+    products,
+    perPage,
+  } = useSelector((state) => state.home);
+  // states
+
   const [filter, setFilter] = useState(true);
   const [rating, setRating] = useState(0);
   const [styles, setStyles] = useState("grid");
-  const [state, setState] = useState({ values: [50, 1500] });
+  const [state, setState] = useState({
+    values: [priceRange.low, priceRange.high],
+  });
 
-  const [perPage, setPerPage] = useState(1);
+  // const [perPage, setPerPage] = useState(1);
+
   const [pageNumber, setPageNumber] = useState(1);
 
-  const categorys = [
-    "Phone",
-    "Laptop",
-    "Watch",
-    "Earphones",
-    "Books",
-    "Charger",
-    "Earbuds",
-    "Neckband",
-  ];
+  const [category, setCategory] = useState("");
+
+  const [sortPrice, setSortPrice] = useState("");
+
+  // use effects
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(price_range_products());
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      query_products({
+        low: state.values[0],
+        high: state.values[1],
+        category,
+        rating,
+        sortPrice,
+        pageNumber,
+      })
+    );
+  }, [
+    state.values[0],
+    state.values[1],
+    category,
+    rating,
+    sortPrice,
+    pageNumber,
+  ]);
+
+  useEffect(() => {
+    setState({
+      values: [priceRange.low, priceRange.high],
+    });
+  }, [priceRange]);
+
+  // additional functions
+
+  const queryCategory = (e, value) => {
+    if (e.target.checked) {
+      setCategory(value);
+    } else {
+      setCategory("");
+    }
+  };
+
+  // const categorys = [
+  //   "Phone",
+  //   "Laptop",
+  //   "Watch",
+  //   "Earphones",
+  //   "Books",
+  //   "Charger",
+  //   "Earbuds",
+  //   "Neckband",
+  // ];
 
   return (
     <div>
@@ -74,13 +140,18 @@ const Shop = () => {
               </h2>
               <div className="py-2 ">
                 {categorys.map((c, i) => (
-                  <div className="flex justify-start gap-2 py-1">
-                    <input type="checkbox" id={c} />
+                  <div key={i} className="flex justify-start gap-2 py-1">
+                    <input
+                      checked={category === c.name ? true : false}
+                      onChange={(e) => queryCategory(e, c.name)}
+                      type="checkbox"
+                      id={c.name}
+                    />
                     <label
                       className="text-slate-600 block cursor-pointer"
-                      htmlFor={c}
+                      htmlFor={c.name}
                     >
-                      {c}
+                      {c.name}
                     </label>
                   </div>
                 ))}
@@ -102,9 +173,9 @@ const Shop = () => {
                     <div {...props} className="w-4 h-4 bg-blue-400"></div>
                   )}
                   onChange={(values) => setState({ values })}
-                  step={10}
-                  min={50}
-                  max={1500}
+                  step={100}
+                  min={priceRange.low}
+                  max={priceRange.high}
                   values={state.values}
                 />
                 <div>
@@ -131,7 +202,7 @@ const Shop = () => {
                   </div>
 
                   <div
-                    onClick={() => setRating(5)}
+                    onClick={() => setRating(4)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl "
                   >
                     {[0, 1, 2, 3].map((a) => (
@@ -145,7 +216,7 @@ const Shop = () => {
                   </div>
 
                   <div
-                    onClick={() => setRating(5)}
+                    onClick={() => setRating(3)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl "
                   >
                     {[0, 1, 2].map((a) => (
@@ -161,7 +232,7 @@ const Shop = () => {
                   </div>
 
                   <div
-                    onClick={() => setRating(5)}
+                    onClick={() => setRating(2)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl "
                   >
                     {[0, 1].map((a) => (
@@ -176,7 +247,7 @@ const Shop = () => {
                     ))}
                   </div>
                   <div
-                    onClick={() => setRating(5)}
+                    onClick={() => setRating(1)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl "
                   >
                     {[0].map((a) => (
@@ -190,10 +261,7 @@ const Shop = () => {
                       </span>
                     ))}
                   </div>
-                  <div
-                    onClick={() => setRating(5)}
-                    className="text-orange-500 flex justify-start items-start gap-2 text-xl "
-                  >
+                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl ">
                     {[0, 1, 2, 3, 4].map((a) => (
                       <span>
                         <CiStar />
@@ -205,7 +273,7 @@ const Shop = () => {
 
               <div className="py-5 flex flex-col gap-4 md:hidden">
                 <div className="overflow-hidden">
-                  <Products title="Top Rated Products" />
+                  <Products title="Latest Products" products={latest_product} />
                 </div>
               </div>
             </div>
@@ -218,6 +286,7 @@ const Shop = () => {
                   </h2>
                   <div className="flex justify-center items-center gap-3">
                     <select
+                      onChange={(e) => setSortPrice(e.target.value)}
                       className="p-1 border outline-0 text-slate-600 font-semibold"
                       name=""
                       id=""
@@ -247,16 +316,18 @@ const Shop = () => {
                   </div>
                 </div>
                 <div className="pb-8 ">
-                  <ShopProducts styles={styles} />
+                  <ShopProducts products={products} styles={styles} />
                 </div>
                 <div>
-                  <Pagination
-                    pageNumber={pageNumber}
-                    setPageNumber={setPageNumber}
-                    totalItem={10}
-                    perPage={perPage}
-                    showItem={Math.floor(10 / 3)}
-                  />
+                  {totalProduct > perPage && (
+                    <Pagination
+                      pageNumber={pageNumber}
+                      setPageNumber={setPageNumber}
+                      totalItem={totalProduct}
+                      perPage={perPage}
+                      showItem={Math.floor(totalProduct / perPage)}
+                    />
+                  )}
                 </div>
               </div>
             </div>

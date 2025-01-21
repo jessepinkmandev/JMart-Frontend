@@ -6,36 +6,39 @@ import Header from "../components/Header";
 import Products from "../components/Products";
 import FeatureProducts from "../components/products/FeatureProducts";
 import { useEffect } from "react";
-import { get_category, get_products } from "../store/reducers/homeReducer";
+import { get_products } from "../store/reducers/homeReducer";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { categorys } = useSelector((state) => state.home);
+  const { products, latestProducts, topRatedProducts, discountProducts } =
+    useSelector((state) => state.home);
 
   useEffect(() => {
-    dispatch(get_category());
     dispatch(get_products());
   }, []);
 
   return (
     <div className="w-full">
-      <Header categorys={categorys} />
+      <Header />
       <Banner />
-      <Categorys categorys={categorys} />
+      <Categorys />
       <div className="py-12">
-        <FeatureProducts />
+        <FeatureProducts products={products} />
       </div>
       <div className="py-10">
         <div className="w-[85%] flex flex-wrap mx-auto">
           <div className="grid w-full grid-cols-3 md-lg:grid-cols-2 md:grid-cols-1 gap-7">
             <div className="overflow-hidden">
-              <Products title="Latest Products" />
+              <Products products={latestProducts} title="Latest Products" />
             </div>
             <div className="overflow-hidden">
-              <Products title="Discount Products" />
+              <Products products={discountProducts} title="Discount Products" />
             </div>
             <div className="overflow-hidden">
-              <Products title="Top Rated Products" />
+              <Products
+                products={topRatedProducts}
+                title="Top Rated Products"
+              />
             </div>
           </div>
         </div>
