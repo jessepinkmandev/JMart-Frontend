@@ -43,10 +43,13 @@ export const price_range_products = createAsyncThunk(
 export const query_products = createAsyncThunk(
   "product/query_products",
   async (query, { fulfillWithValue }) => {
-    const { low, high, category, rating, sortPrice, pageNumber } = query;
+    const { low, high, category, rating, sortPrice, pageNumber, searchValue } =
+      query;
     try {
       const { data } = await api.get(
-        `/home/query-products?category=${category}&&rating=${rating}&&lowPrice=${low}&&highPrice=${high}&&sortPrice=${sortPrice}&&pagenumber=${pageNumber}`
+        `/home/query-products?category=${category}&&rating=${rating}&&lowPrice=${low}&&highPrice=${high}&&sortPrice=${sortPrice}&&pagenumber=${pageNumber}&&searchValue=${
+          searchValue ? searchValue : ""
+        }`
       );
       console.log(data);
       return fulfillWithValue(data);
@@ -79,7 +82,7 @@ export const homeReducer = createSlice({
       })
       .addCase(get_products.fulfilled, (state, { payload }) => {
         state.products = payload.products;
-        state.latest_products = payload.latest_product;
+        state.latest_product = payload.latest_product;
         state.topRatedProducts = payload.topRatedProducts;
         state.discountProducts = payload.discountProducts;
       })

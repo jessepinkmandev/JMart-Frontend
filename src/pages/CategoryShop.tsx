@@ -1,7 +1,7 @@
 import { IoIosArrowForward } from "react-icons/io";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Range } from "react-range";
 import { AiFillStar } from "react-icons/ai";
@@ -17,7 +17,10 @@ import {
   query_products,
 } from "../store/reducers/homeReducer";
 
-const Shop = () => {
+const CategoryShop = () => {
+  let [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category");
+  console.log(category);
   // get state
   const {
     categorys,
@@ -40,8 +43,6 @@ const Shop = () => {
 
   const [pageNumber, setPageNumber] = useState(1);
 
-  const [category, setCategory] = useState("");
-
   const [sortPrice, setSortPrice] = useState("");
 
   // use effects
@@ -56,8 +57,8 @@ const Shop = () => {
 
     dispatch(
       query_products({
-        low: state.values[0],
-        high: state.values[1],
+        low: state.values[0] || "",
+        high: state.values[1] || "",
         category,
         rating,
         sortPrice,
@@ -81,25 +82,6 @@ const Shop = () => {
 
   // additional functions
 
-  const queryCategory = (e, value) => {
-    if (e.target.checked) {
-      setCategory(value);
-    } else {
-      setCategory("");
-    }
-  };
-
-  // const categorys = [
-  //   "Phone",
-  //   "Laptop",
-  //   "Watch",
-  //   "Earphones",
-  //   "Books",
-  //   "Charger",
-  //   "Earbuds",
-  //   "Neckband",
-  // ];
-
   const reset = () => {
     setRating("");
     dispatch(
@@ -121,13 +103,13 @@ const Shop = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center w-full h-full text-white">
-              <h2 className="text-3xl font-bold">Shop Page</h2>
+              <h2 className="text-3xl font-bold">Category Page</h2>
               <div className="flex justify-center items-center gap-2 text-2xl w-full ">
                 <Link to="/">Home</Link>
                 <span className="pt-1">
                   <IoIosArrowForward />
                 </span>
-                <span>Shop </span>
+                <span>Category </span>
               </div>
             </div>
           </div>
@@ -151,27 +133,6 @@ const Shop = () => {
                   : "md:h-auto md:overflow-auto md:mb-0"
               }`}
             >
-              <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                Category
-              </h2>
-              <div className="py-2 ">
-                {categorys.map((c, i) => (
-                  <div key={i} className="flex justify-start gap-2 py-1">
-                    <input
-                      checked={category === c.name ? true : false}
-                      onChange={(e) => queryCategory(e, c.name)}
-                      type="checkbox"
-                      id={c.name}
-                    />
-                    <label
-                      className="text-slate-600 block cursor-pointer"
-                      htmlFor={c.name}
-                    >
-                      {c.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
               <div className="py-2 flex flex-col gap-5">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Price
@@ -358,4 +319,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default CategoryShop;

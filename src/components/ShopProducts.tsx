@@ -1,7 +1,10 @@
 import { FaEye, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Rating from "./Rating";
+import { useSelector } from "react-redux";
 
-const ShopProducts = ({ styles, products }) => {
+const ShopProducts = ({ styles }) => {
+  const { products } = useSelector((state) => state.home);
+
   return (
     <div
       className={`w-full gap-3 grid ${
@@ -48,7 +51,7 @@ const ShopProducts = ({ styles, products }) => {
             <div className="flex justify-start items-start gap-3">
               <span className="text-md font-semibold">${p.price}</span>
               <div className="flex">
-                <Rating rating={p.raing} />
+                <Rating rating={p.rating} />
               </div>
             </div>
           </div>

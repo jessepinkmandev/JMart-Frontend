@@ -9,6 +9,8 @@ import Cart from "./pages/Cart";
 import Shipping from "./pages/Shipping";
 import ProductDetails from "./pages/ProductDetails";
 import { get_category } from "./store/reducers/homeReducer";
+import CategoryShop from "./pages/CategoryShop";
+import SearchProducts from "./components/SearchProducts";
 
 function App() {
   const dispatch = useDispatch();
@@ -24,7 +26,9 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/shipping" element={<Shipping />} />
+        <Route path="/products?" element={<CategoryShop />} />
         <Route path="/product/details/:id" element={<ProductDetails />} />
+        <Route path="/products/search?" element={<SearchProducts />} />
       </Routes>
     </BrowserRouter>
   );
