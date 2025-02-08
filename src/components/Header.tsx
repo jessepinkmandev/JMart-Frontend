@@ -24,9 +24,10 @@ const style = {
 const Header = () => {
   const navigate = useNavigate();
   const { categorys } = useSelector((state) => state.home);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { cart_product_count } = useSelector((state) => state.cart);
 
   const { pathname } = useLocation();
-  const user = true;
   const [showSidebar, setShowSidebar] = useState(true);
   const [categoryShow, setCategoryShow] = useState(true);
   const [searchValue, setSearchValue] = useState("");
@@ -95,7 +96,7 @@ const Header = () => {
                     <li>English</li>
                   </ul>
                 </div>
-                {user ? (
+                {userInfo ? (
                   <Link
                     to="/dashboard"
                     className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
@@ -103,7 +104,7 @@ const Header = () => {
                     <span>
                       <FaUser />
                     </span>
-                    <span>Jesse</span>
+                    <span>{userInfo.name}</span>
                   </Link>
                 ) : (
                   <Link
@@ -211,13 +212,24 @@ const Header = () => {
                       </div>
                     </div>
 
-                    <div className="relative flex justify-center items-center cursor-pointer w-9 h-9 rounded-full bg-slate-200">
+                    <div
+                      onClick={() => {
+                        if (userInfo) {
+                          navigate("/cart");
+                        } else {
+                          navigate("/");
+                        }
+                      }}
+                      className="relative flex justify-center items-center cursor-pointer w-9 h-9 rounded-full bg-slate-200"
+                    >
                       <span className="text-xl text-green-500">
                         <FaShoppingCart />
                       </span>
-                      <div className="w-5 h-5 absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-1 -right-1">
-                        {wishlist_count}
-                      </div>
+                      {cart_product_count !== 0 && (
+                        <div className="w-5 h-5 absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-1 -right-1">
+                          {cart_product_count}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -263,7 +275,7 @@ const Header = () => {
                   <li>English</li>
                 </ul>
               </div>
-              {user ? (
+              {userInfo ? (
                 <Link
                   to="/dashboard"
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black"
@@ -271,7 +283,7 @@ const Header = () => {
                   <span>
                     <FaUser />
                   </span>
-                  <span>Jesse</span>
+                  <span>{userInfo.name}</span>
                 </Link>
               ) : (
                 <Link

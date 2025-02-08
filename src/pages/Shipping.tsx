@@ -1,13 +1,21 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { IoIosArrowForward } from "react-icons/io";
 import { useState } from "react";
-import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+// import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { place_order } from "../store/reducers/orderReducer";
 
 const Shipping = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const {
+    state: { products, price, shipping_fee, items },
+  } = useLocation();
   const cart_products = [1, 2];
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [res, setRes] = useState(false);
   const [state, setState] = useState({
@@ -34,6 +42,21 @@ const Shipping = () => {
     if (name && address && phone && post && province && city && area) {
       setRes(true);
     }
+  };
+
+  const placeOrder = () => {
+    dispatch(
+      place_order({
+        products,
+        price,
+        shipping_fee,
+        items,
+        shippingInfo: state,
+        userId: userInfo.id,
+        navigate,
+      })
+    );
+    //
   };
 
   return (
@@ -201,27 +224,29 @@ const Shipping = () => {
                     </div>
                   )}
                 </div>
-                {cart_products.map((p) => (
-                  <div className="flex bg-white p-4 flex-col gap-2 ">
+                {products.map((p, i) => (
+                  <div key={i} className="flex bg-white p-4 flex-col gap-2 ">
                     <div className="flex justify-center items-center ">
-                      <h2 className="text-md to-slate-600 font-bold">J Mart</h2>
+                      <h2 className="text-md to-slate-600 font-bold">
+                        {p.shopName}
+                      </h2>
                     </div>
-                    {[1, 2].map((a) => (
+                    {p.products.map((pt) => (
                       <div className="w-full flex flex-wrap ">
                         <div className="flex sm:w-full gap-2 w-7/12 ">
                           <div className="flex gap-2 justify-start items-center ">
                             <img
                               className="h-20 w-20 "
-                              src={`http://localhost:5173/products/${
-                                a + 1
-                              }.webp`}
+                              src={pt.productInfo.images[0]}
                               alt=""
                             />
                             <div className="pr-4 text-slate-600">
                               <h2 className="text-md font-semibold">
-                                Product Name
+                                {pt.productInfo.name}
                               </h2>
-                              <span className="text-sm">Brand: Jess</span>
+                              <span className="text-sm">
+                                Brand: {pt.productInfo.brand}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -230,23 +255,24 @@ const Shipping = () => {
 
                         <div className="flex justify-between w-5/12 sm:w-full sm:mt-3">
                           <div className="pl-4 sm:pl-0">
-                            <h2 className="text-lg text-orange-600">$120</h2>
-                            <p className="line-through">$150</p>
-                            <p>-15%</p>
+                            <h2 className="text-lg text-orange-600">
+                              ${" "}
+                              {pt.productInfo.price -
+                                Math.floor(
+                                  (pt.productInfo.price *
+                                    pt.productInfo.discount) /
+                                    100
+                                )}
+                            </h2>
+                            <p className="line-through">
+                              $ {pt.productInfo.price}
+                            </p>
+                            <p>{pt.productInfo.discount}% OFF</p>
                           </div>
                           <div className="flex flex-col gap-2">
-                            <div className="flex bg-slate-300 h-8 justify-center items-center text-xl">
-                              <div className="px-3 cursor-pointer">
-                                <AiOutlineMinus />
-                              </div>
-                              <div className="px-3 ">2</div>
-                              <div className="px-3 cursor-pointer">
-                                <AiOutlinePlus />
-                              </div>
+                            <div className="flex bg-slate-200 h-8 justify-center items-center text-xl">
+                              <div className="p-3 ">Qty. {pt.quantity}</div>
                             </div>
-                            <button className="px-5 py-1.5 bg-red-500 text-white">
-                              Delete
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -260,34 +286,27 @@ const Shipping = () => {
                 <div className="bg-white p-3 text-slate-600 flex flex-col gap-3">
                   <h2 className="text-left font-bold">Order Summary</h2>
                   <div className="flex justify-between items-center ">
-                    <span className="">Total Items (5)</span>
-                    <span className="">$312</span>
+                    <span className="">Total Items ({items})</span>
+                    <span className="">${price}</span>
                   </div>
                   <div className="flex justify-between items-center ">
                     <span className="">Delivery Fee</span>
-                    <span className="">$10</span>
+                    <span className="">${shipping_fee}</span>
                   </div>
                   <div className="flex justify-between items-center ">
                     <span className="">Total Payment </span>
-                    <span className="">$322</span>
+                    <span className="">${price + shipping_fee}</span>
                   </div>
 
                   <div className="flex justify-between items-center ">
                     <span className="">Total </span>
-                    <span className="text-lg text-green-600">$342</span>
+                    <span className="text-lg text-green-600">
+                      ${price + shipping_fee}
+                    </span>
                   </div>
                   <button
                     disabled={res ? false : true}
-                    onClick={() =>
-                      navigate("/shipping", {
-                        state: {
-                          products: [],
-                          price: 500,
-                          shipping_fee: 40,
-                          items: 2,
-                        },
-                      })
-                    }
+                    onClick={placeOrder}
                     className={`px-5 py-1.5 rounded-sm hover:shadow-red-500/50 hover:shadow-lg  text-lg text-white ${
                       res ? "bg-red-500" : "bg-slate-300"
                     } `}

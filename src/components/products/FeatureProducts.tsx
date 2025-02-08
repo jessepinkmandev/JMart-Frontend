@@ -1,9 +1,46 @@
 import { FaEye, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Rating from "../Rating";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { add_to_cart, messageClear } from "../../store/reducers/cartReducer";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const FeatureProducts = ({ products }) => {
+  const { userInfo } = useSelector((state) => state.auth);
+  const { cart_products_count, successMessage, errorMessage } = useSelector(
+    (state) => state.cart
+  );
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  //
+
+  const add_cart = (id) => {
+    dispatch(
+      add_to_cart({
+        userId: userInfo.id,
+        quantity: 1,
+        productId: id,
+      })
+    );
+  };
   // const rating = 4;
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [successMessage, errorMessage]);
+
   return (
     <div className="w-[85%] flex flex-wrap mx-auto ">
       <div className="w-full">
@@ -42,7 +79,10 @@ const FeatureProducts = ({ products }) => {
                   >
                     <FaEye />
                   </Link>
-                  <li className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all">
+                  <li
+                    onClick={() => add_cart(p._id)}
+                    className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all"
+                  >
                     <FaShoppingCart />
                   </li>
                 </ul>
