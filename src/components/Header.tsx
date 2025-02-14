@@ -25,14 +25,16 @@ const Header = () => {
   const navigate = useNavigate();
   const { categorys } = useSelector((state) => state.home);
   const { userInfo } = useSelector((state) => state.auth);
-  const { cart_product_count } = useSelector((state) => state.cart);
+  const { cart_product_count, wishlist_products_count } = useSelector(
+    (state) => state.cart
+  );
 
   const { pathname } = useLocation();
   const [showSidebar, setShowSidebar] = useState(true);
   const [categoryShow, setCategoryShow] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
-  const wishlist_count = 4;
+  // const wishlist_count = 4;
 
   const search = () => {
     navigate(
@@ -130,8 +132,8 @@ const Header = () => {
               <div className="flex justify-between items-center">
                 <Link to="/">
                   <img
-                    className="w-8 h-8"
-                    src="https://picsum.photos/200/300/?blur"
+                    className=""
+                    src={`http://localhost:5173/logo.png`}
                     alt=""
                   />
                 </Link>
@@ -203,13 +205,24 @@ const Header = () => {
 
                 <div className="flex md-lg:hidden justify-center items-center gap-5 ">
                   <div className="flex justify-center gap-5">
-                    <div className="relative flex justify-center items-center cursor-pointer w-9 h-9 rounded-full bg-slate-200">
+                    <div
+                      onClick={() => {
+                        if (userInfo) {
+                          navigate("/dashboard/my-wishlist");
+                        } else {
+                          navigate("/");
+                        }
+                      }}
+                      className="relative flex justify-center items-center cursor-pointer w-9 h-9 rounded-full bg-slate-200"
+                    >
                       <span className="text-xl text-green-500">
                         <AiFillHeart />
                       </span>
-                      <div className="w-5 h-5 absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-1 -right-1">
-                        {wishlist_count}
-                      </div>
+                      {wishlist_products_count !== 0 && (
+                        <div className="w-5 h-5 absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-1 -right-1">
+                          {wishlist_products_count}
+                        </div>
+                      )}
                     </div>
 
                     <div

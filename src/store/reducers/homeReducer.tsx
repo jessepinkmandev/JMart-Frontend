@@ -19,7 +19,7 @@ export const get_products = createAsyncThunk(
   async (_, { fulfillWithValue }) => {
     try {
       const { data } = await api.get("/home/get-products");
-      console.log(data);
+      // console.log(data);
       return fulfillWithValue(data);
     } catch (error) {
       console.log(error.response);
@@ -32,13 +32,29 @@ export const price_range_products = createAsyncThunk(
   async (_, { fulfillWithValue }) => {
     try {
       const { data } = await api.get("/home/price-range-latest-product");
-      console.log(data);
+      // console.log(data);
       return fulfillWithValue(data);
     } catch (error) {
       console.log(error.response);
     }
   }
 );
+
+//
+export const product_details = createAsyncThunk(
+  "product/product_details",
+  async (slug, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/home/product-details/${slug}`);
+      // console.log(data);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+
+//
 
 export const query_products = createAsyncThunk(
   "product/query_products",
@@ -64,6 +80,9 @@ export const homeReducer = createSlice({
   initialState: {
     categorys: [],
     products: [],
+    product: {},
+    relatedProduct: [],
+    moreProduct: [],
     totalProduct: 0,
     perpage: 3,
     latest_product: [],
@@ -94,6 +113,11 @@ export const homeReducer = createSlice({
         state.products = payload.products;
         state.totalProduct = payload.totalProduct;
         state.perpage = payload.perpage;
+      })
+      .addCase(product_details.fulfilled, (state, { payload }) => {
+        state.product = payload.product;
+        state.relatedProduct = payload.relatedProduct;
+        state.moreProduct = payload.moreProduct;
       });
   },
 });

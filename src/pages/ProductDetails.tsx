@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { IoIosArrowForward } from "react-icons/io";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Rating from "../components/Rating";
 import {
   FaFacebook,
@@ -14,8 +14,20 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import Review from "../components/Review";
+import { product_details } from "../store/reducers/homeReducer";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const { product, relatedProduct, moreProduct } = useSelector(
+    (state) => state.home
+  );
+  useEffect(() => {
+    dispatch(product_details(id));
+  }, [id]);
+
   const images = [1, 2, 3, 4, 5, 6];
   const discount = 10;
   const stock = 3;
@@ -52,6 +64,23 @@ const ProductDetails = () => {
     },
   };
 
+  const [quantity, setQuantity] = useState(1);
+
+  const increment = () => {
+    if (quantity >= product.stock) {
+      toast.error("Out Of Stock");
+    } else {
+      setQuantity(quantity + 1);
+    }
+  };
+  const decrement = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    } else {
+      toast.error("Minimum Quantity Reached");
+    }
+  };
+
   return (
     <div>
       <Header />
@@ -73,11 +102,11 @@ const ProductDetails = () => {
               <span className="pt-1">
                 <IoIosArrowForward />
               </span>
-              <Link to="/category">Category</Link>
+              <Link to="/category">{product.category}</Link>
               <span className="pt-1">
                 <IoIosArrowForward />
               </span>
-              <span className="pt-1">Product Name </span>
+              <span className="pt-1">{product.name} </span>
             </div>
           </div>
         </div>
@@ -88,25 +117,22 @@ const ProductDetails = () => {
           <div className="grid grid-cols-2 md-lg:grid-cols-1 gap-8 ">
             <div>
               <div className="p-5 border h-100 w-full">
-                <img
-                  src={`http://localhost:5173/products/${pic}.webp`}
-                  alt=""
-                />
+                <img src={product.images?.[0]} alt="" />
               </div>
               <div className="py-3">
-                {images && (
+                {product.images && (
                   <Carousel
                     autoPlay={true}
                     infinite={true}
                     responsive={responsive}
                     transitionDuration={500}
                   >
-                    {images.map((img, i) => (
+                    {product.images.map((img, i) => (
                       <div key={i}>
                         <img
-                          onClick={() => setPic(i + 1)}
+                          onClick={() => setPic(img)}
                           className="h-32 cursor-pointer"
-                          src={`http://localhost:5173/products/${i + 1}.webp`}
+                          src={img}
                           alt=""
                         />
                       </div>
@@ -117,42 +143,49 @@ const ProductDetails = () => {
             </div>
             <div className="flex flex-col gap-5">
               <div className="text-3xl text-slate-600 font-bold">
-                <h1>Product name</h1>
+                <h1>{product.name}</h1>
               </div>
               <div className="flex justify-start items-center gap-4">
                 <div className="flex text-xl">
-                  <Rating rating="4" />
+                  <Rating rating={product.rating} />
                 </div>
                 <span className="text-slate-500">(24 Reviews)</span>
               </div>
               <div className="text-2xl text-red-500 font-bold flex gap-3">
-                {discount !== 0 ? (
+                {product.discount !== 0 ? (
                   <>
                     Price:
-                    <h2 className="line-through"> $500</h2>
+                    <h2 className="line-through"> ${product.price}</h2>
                     <h2>
-                      ${500 - Math.floor((500 * discount) / 100)} (-{discount}%)
+                      $
+                      {product.price -
+                        Math.floor(
+                          (product.price * product.discount) / 100
+                        )}{" "}
+                      (-{discount}%)
                     </h2>
                   </>
                 ) : (
-                  <h2>Price: $200</h2>
+                  <h2>Price: ${product.price}</h2>
                 )}
               </div>
               <div className="text-slate-600 ">
                 <p>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Eligendi molestiae delectus non at iusto, assumenda qui
-                  accusantium. Eos explicabo doloremque qui laudantium inventore
-                  odio nulla aliquam repellat vel neque.
+                  {product.description.substring(0, 100)}
+                  {"..."}
                 </p>
               </div>
               <div className="flex gap-3 pb-10 border-b">
-                {stock ? (
+                {product.stock ? (
                   <div className="flex gap-4">
                     <div className="flex bg-slate-200 h-12 justify-center items-center text-xl">
-                      <div className="px-6 cursor-pointer">-</div>
-                      <div className="px-6 ">2</div>
-                      <div className="px-6 cursor-pointer">+</div>
+                      <div onClick={decrement} className="px-6 cursor-pointer">
+                        -
+                      </div>
+                      <div className="px-6 ">{quantity}</div>
+                      <div onClick={increment} className="px-6 cursor-pointer">
+                        +
+                      </div>
                     </div>
                     <div className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-green-500/40 text-white bg-blue-400">
                       <button>Add to Cart</button>
@@ -174,8 +207,12 @@ const ProductDetails = () => {
                   <span>Share on</span>
                 </div>
                 <div className="flex flex-col gap-5">
-                  <span className={`text-${stock ? "green" : "red"}-500`}>
-                    {stock ? `In Stock(${stock})` : "Out of stock"}
+                  <span
+                    className={`text-${product.stock ? "green" : "red"}-500`}
+                  >
+                    {product.stock
+                      ? `In Stock(${product.stock})`
+                      : "Out of stock"}
                   </span>
                   <ul className="flex justify-start items-center gap-3">
                     <li>

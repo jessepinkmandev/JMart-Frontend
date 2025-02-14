@@ -2,7 +2,11 @@ import { FaEye, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Rating from "../Rating";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { add_to_cart, messageClear } from "../../store/reducers/cartReducer";
+import {
+  add_to_cart,
+  add_to_wishlist,
+  messageClear,
+} from "../../store/reducers/cartReducer";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -15,6 +19,15 @@ const FeatureProducts = ({ products }) => {
   const dispatch = useDispatch();
 
   //
+
+  const addWishlist = (p) => {
+    dispatch(
+      add_to_wishlist({
+        product: p,
+        userId: userInfo.id,
+      })
+    );
+  };
 
   const add_cart = (id) => {
     dispatch(
@@ -70,11 +83,14 @@ const FeatureProducts = ({ products }) => {
                   alt=""
                 />
                 <ul className="flex transition-all duration-700 -bottom-10 justify-center items-center gap-2 absolute w-full group-hover:bottom-3">
-                  <li className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all">
+                  <li
+                    onClick={() => addWishlist(p)}
+                    className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all"
+                  >
                     <FaRegHeart />
                   </li>
                   <Link
-                    to="/product/details/new"
+                    to={`/product/details/${p.slug}`}
                     className="w-9 h-9 cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-slate-500 hover:text-white hover:rotate-[720deg] transition-all"
                   >
                     <FaEye />

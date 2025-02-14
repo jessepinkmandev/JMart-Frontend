@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/api";
+import Wishlist from "./../../components/Dashboard/Wishlist";
 
 export const add_to_cart = createAsyncThunk(
   "cart/add_to_cart",
@@ -77,6 +78,49 @@ export const quantity_decrement = createAsyncThunk(
 
 //
 
+export const add_to_wishlist = createAsyncThunk(
+  "cart/add_to_wishlist",
+  async (info, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post(`/cart/add-to-wishlist/`, info);
+      // console.log(data);
+
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//
+export const get_wishlist = createAsyncThunk(
+  "cart/get_wishlist",
+  async (userId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/cart/get-wishlist/${userId}`);
+      // console.log(data);
+
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//
+export const delete_wishlist = createAsyncThunk(
+  "cart/delete_wishlist",
+  async (wishlistId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.delete(`/cart/delete-wishlist/${wishlistId}`);
+      // console.log(data);
+
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//
+
 export const cartReducer = createSlice({
   name: "cart",
   initialState: {
@@ -122,6 +166,27 @@ export const cartReducer = createSlice({
       })
       .addCase(quantity_decrement.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message;
+      })
+      .addCase(add_to_wishlist.rejected, (state, { payload }) => {
+        state.errorMessage = payload.error;
+      })
+      .addCase(add_to_wishlist.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+        state.wishlist_products_count =
+          state.wishlist_products_count > 0
+            ? state.wishlist_products_count + 1
+            : 1;
+      })
+      .addCase(get_wishlist.fulfilled, (state, { payload }) => {
+        state.wishlist_products = payload.wishlist;
+        state.wishlist_products_count = payload.wishlistCount;
+      })
+      .addCase(delete_wishlist.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+        state.wishlist_products = state.wishlist_products.filter(
+          (p) => p._id !== payload.wishlistId
+        );
+        state.wishlist_products_count = state.wishlist_products_count - 1;
       });
   },
 });
