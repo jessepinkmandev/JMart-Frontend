@@ -75,6 +75,36 @@ export const query_products = createAsyncThunk(
   }
 );
 
+//
+export const customer_review = createAsyncThunk(
+  "product/customer_review",
+  async (info, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.post(`/home/customer/submit-review`, info);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+
+//
+export const get_review = createAsyncThunk(
+  "product/get_review",
+  async ({ productId, pageNumber }, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(
+        `/home/customer/get-review/${productId}?pageNumber=${pageNumber}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+
+//
+
 export const homeReducer = createSlice({
   name: "home",
   initialState: {
@@ -88,12 +118,22 @@ export const homeReducer = createSlice({
     latest_product: [],
     topRatedProducts: [],
     discountProducts: [],
+    errorMessage: "",
+    successMessage: "",
+    totalReview: 0,
+    rating_review: [],
+    reviews: [],
     priceRange: {
       low: 0,
       high: 100,
     },
   },
-  reducers: {},
+  reducers: {
+    messageClear: (state, _) => {
+      state.errorMessage = "";
+      state.successMessage = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(get_category.fulfilled, (state, { payload }) => {
@@ -118,8 +158,17 @@ export const homeReducer = createSlice({
         state.product = payload.product;
         state.relatedProduct = payload.relatedProduct;
         state.moreProduct = payload.moreProduct;
+      })
+      .addCase(customer_review.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+      })
+      .addCase(get_review.fulfilled, (state, { payload }) => {
+        state.reviews = payload.reviews;
+        state.totalReview = payload.totalReview;
+        state.rating_review = payload.rating_review;
       });
   },
 });
 
 export default homeReducer.reducer;
+export const { messageClear } = homeReducer.actions;

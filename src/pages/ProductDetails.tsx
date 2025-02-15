@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { IoIosArrowForward } from "react-icons/io";
@@ -17,10 +17,20 @@ import Review from "../components/Review";
 import { product_details } from "../store/reducers/homeReducer";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import {
+  add_to_cart,
+  add_to_wishlist,
+  messageClear,
+} from "../store/reducers/cartReducer";
+import Cart from "./Cart";
 
 const ProductDetails = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
+  const { userInfo } = useSelector((state) => state.auth);
+  const { successMessage, errorMessage } = useSelector((state) => state.cart);
+
   const { product, relatedProduct, moreProduct } = useSelector(
     (state) => state.home
   );
@@ -79,6 +89,67 @@ const ProductDetails = () => {
     } else {
       toast.error("Minimum Quantity Reached");
     }
+  };
+
+  const add_cart = () => {
+    dispatch(
+      add_to_cart({
+        userId: userInfo.id,
+        quantity: quantity,
+        productId: product._id,
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
+
+  const add_wishlist = () => {
+    dispatch(
+      add_to_wishlist({
+        product,
+        userId: userInfo.id,
+      })
+    );
+  };
+
+  const buynow = () => {
+    let price = 0;
+    if (product.discount !== 0) {
+      price =
+        product.price - Math.floor((product.price * product.discount) / 100);
+    } else {
+      price = product.price;
+    }
+    const obj = [
+      {
+        sellerId: product.sellerId,
+        shopName: product.shopName,
+        price: quantity * (price - Math.floor((price * 5) / 100)),
+        products: [
+          {
+            quantity,
+            productInfo: product,
+          },
+        ],
+      },
+    ];
+    navigate("/shipping", {
+      state: {
+        products: obj,
+        price: price * quantity,
+        shipping_fee: 40,
+        items: 1,
+      },
+    });
   };
 
   return (
@@ -149,7 +220,7 @@ const ProductDetails = () => {
                 <div className="flex text-xl">
                   <Rating rating={product.rating} />
                 </div>
-                <span className="text-slate-500">(24 Reviews)</span>
+                <span className="text-slate-500">( Reviews)</span>
               </div>
               <div className="text-2xl text-red-500 font-bold flex gap-3">
                 {product.discount !== 0 ? (
@@ -171,7 +242,7 @@ const ProductDetails = () => {
               </div>
               <div className="text-slate-600 ">
                 <p>
-                  {product.description.substring(0, 100)}
+                  {product.description}
                   {"..."}
                 </p>
               </div>
@@ -187,7 +258,10 @@ const ProductDetails = () => {
                         +
                       </div>
                     </div>
-                    <div className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-green-500/40 text-white bg-blue-400">
+                    <div
+                      onClick={add_cart}
+                      className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-green-500/40 text-white bg-blue-400"
+                    >
                       <button>Add to Cart</button>
                     </div>
                   </div>
@@ -195,7 +269,10 @@ const ProductDetails = () => {
                   ""
                 )}
                 <div className="">
-                  <div className="h-12 w-12 flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-cyan-500/40 bg bg-cyan-500 text-white">
+                  <div
+                    onClick={add_wishlist}
+                    className="h-12 w-12 flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-cyan-500/40 bg bg-cyan-500 text-white"
+                  >
                     <FaHeart />
                   </div>
                 </div>
@@ -251,14 +328,20 @@ const ProductDetails = () => {
                 </div>
               </div>
               <div className="flex gap-3 pb-12  ">
-                {stock ? (
-                  <button className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-green-500/40 text-white bg-green-500">
+                {product.stock ? (
+                  <button
+                    onClick={buynow}
+                    className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-green-500/40 text-white bg-green-500"
+                  >
                     Buy now
                   </button>
                 ) : (
                   ""
                 )}
-                <Link className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-red-500/40 text-white bg-red-500">
+                <Link
+                  to={`/dashboard/chat/${product.sellerId}`}
+                  className="px-8 py-3 h-12 cursor-pointer hover:shadow-lg hover:shadow-red-500/40 text-white bg-red-500"
+                >
                   Chat Seller
                 </Link>
               </div>

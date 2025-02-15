@@ -14,6 +14,7 @@ const Review = () => {
   );
   const [state, setState] = useState("reviews");
   // const discount = 10;
+  // console.log(moreProduct);
   return (
     <section>
       <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] mt-8 h-full pb-16 mx-auto">
@@ -46,7 +47,7 @@ const Review = () => {
               </div>
               <div className="">
                 {state === "reviews" ? (
-                  <Ratings />
+                  <Ratings product={product} />
                 ) : (
                   <p className="py-5 text-slate-700">{product.description}</p>
                 )}
@@ -56,30 +57,26 @@ const Review = () => {
           <div className="w-[28%] md-lg:w-full">
             <div className="pl-4 md-lg:pl-0">
               <div className="px-3 py-2 text-slate-600 bg-slate-200">
-                <h2 className="font-bold">From J Mart</h2>
+                <h2 className="font-bold">More From {product.shopName} </h2>
               </div>
               <div className="flex flex-col gap-5 mt-3 border p-3">
-                {[1, 2, 3].map((a) => (
+                {moreProduct.map((a) => (
                   <Link className="block">
                     <div className="relative h-64 ">
-                      <img
-                        className="w-full h-full"
-                        src={`http://localhost:5173/products/${a}.webp`}
-                        alt=""
-                      />
-                      {product.discount !== 0 && (
+                      <img className="w-full h-full" src={a.images[0]} alt="" />
+                      {a.discount !== 0 && (
                         <div className="flex justify-center items-center absolute text-white w-9 h-9 rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                          {product.discount}%
+                          {a.discount}%
                         </div>
                       )}
                     </div>
-                    <h2 className="text-slate-600 py-1 font-bold">
-                      Product Name
-                    </h2>
+                    <h2 className="text-slate-600 py-1 font-bold">{a.name}</h2>
                     <div className="flex gap-2">
-                      <h2 className="text-lg font-bold text-slate-600">$432</h2>
+                      <h2 className="text-lg font-bold text-slate-600">
+                        ${a.price}
+                      </h2>
                       <div className="flex items-center ml-4 gap-2">
-                        <Rating rating="3" />
+                        <Rating rating={a.rating} />
                       </div>
                     </div>
                   </Link>
@@ -111,32 +108,28 @@ const Review = () => {
             modules={[Pagination]}
             className="mySwiper"
           >
-            {[1, 2, 3, 4, 5, 6].map((a) => (
+            {relatedProduct.map((a) => (
               <SwiperSlide key={a}>
                 <Link className="block">
                   <div className="relative h-64">
                     <div className="w-full h-full">
-                      <img
-                        className="w-full h-full"
-                        src={`http://localhost:5173/products/${a}.webp`}
-                        alt=""
-                      />
+                      <img className="w-full h-full" src={a.images[0]} alt="" />
                       <div className="absolute h-full w-full top-0 left-0 bg-slate-800 opacity-25 hover:opacity-50 transition-all duration-500"></div>
                     </div>
-                    {product.discount !== 0 && (
+                    {a.discount !== 0 && (
                       <div className="flex justify-center items-center absolute text-white w-9 h-9 rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                        {product.discount}%
+                        {a.discount}%
                       </div>
                     )}
                   </div>
                   <div className="p-4 flex flex-col gap-3">
-                    <h2 className="text-slate-600 py-1 font-bold">
-                      Product Name
-                    </h2>
+                    <h2 className="text-slate-600 py-1 font-bold">{a.name} </h2>
                     <div className="flex gap-2">
-                      <h2 className="text-lg font-bold text-slate-600">$432</h2>
+                      <h2 className="text-lg font-bold text-slate-600">
+                        ${a.price}
+                      </h2>
                       <div className="flex items-center ml-4 gap-2">
-                        <Rating rating="3" />
+                        <Rating rating={a.rating} />
                       </div>
                     </div>
                   </div>

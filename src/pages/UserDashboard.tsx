@@ -57,7 +57,7 @@ const UserDashboard = () => {
                   <span className="text-xl">
                     <IoChatbubbleEllipsesSharp />
                   </span>
-                  <Link to="/dashboard">Chat</Link>
+                  <Link to="/dashboard/chat">Chat</Link>
                 </li>
                 {/* / */}
                 <li className="flex justify-start items-center gap-2 py-2">
