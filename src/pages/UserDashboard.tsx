@@ -2,13 +2,31 @@ import { FaBorderAll, FaHeart, FaList } from "react-icons/fa";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { IoIosHome, IoMdLogOut } from "react-icons/io";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { RiLockPasswordLine } from "react-icons/ri";
+import api from "../api/api";
+import { useDispatch } from "react-redux";
+import { user_resets } from "../store/reducers/authReducer";
+import { reset_count } from "../store/reducers/cartReducer";
 
 const UserDashboard = () => {
   const [filterShow, setFilterShow] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const logout = async () => {
+    try {
+      const { data } = await api.get("/customer/logout");
+      localStorage.removeItem("customerToken");
+      dispatch(user_resets());
+      dispatch(reset_count());
+      navigate("/login");
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  };
 
   return (
     <div>
@@ -67,11 +85,14 @@ const UserDashboard = () => {
                   <Link to="/dashboard/change-password">Change Password</Link>
                 </li>
                 {/* / */}
-                <li className="flex justify-start items-center gap-2 py-2">
+                <li
+                  onClick={logout}
+                  className="flex justify-start cursor-pointer items-center gap-2 py-2"
+                >
                   <span className="text-xl">
                     <IoMdLogOut />
                   </span>
-                  <Link to="/dashboard">Logout</Link>
+                  <div to="/dashboard">Logout</div>
                 </li>
                 {/* / */}
               </ul>

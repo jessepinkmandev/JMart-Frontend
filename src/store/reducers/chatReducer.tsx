@@ -45,6 +45,9 @@ export const chatReducer = createSlice({
       state.errorMessage = "";
       state.successMessage = "";
     },
+    updateMessage: (state, { payload }) => {
+      state.fb_messages = [...state.fb_messages, payload];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(add_friend.fulfilled, (state, { payload }) => {
@@ -72,4 +75,4 @@ export const chatReducer = createSlice({
 });
 
 export default chatReducer.reducer;
-export const { messageClear } = chatReducer.actions;
+export const { messageClear, updateMessage } = chatReducer.actions;
